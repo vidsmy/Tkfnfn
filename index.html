@@ -1,1 +1,335 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta name="monetag" content="da0d80a5c ebbd2aa5575234d8507b148">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIDEO HUB</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #09090b;
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .transform-style-3d {
+            transform-style: preserve-3d;
+        }
+        .backface-hidden {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+        .glass {
+            background: rgba(18, 18, 22, 0.9);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(249, 115, 22, 0.25);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+        }
+        .glass-card {
+            background: rgba(24, 24, 27, 0.92);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(249, 115, 22, 0.18);
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-orange-500 selection:text-white bg-zinc-950 text-zinc-100">
 
+    <!-- Top Header -->
+    <header class="w-full py-6 px-4 text-center relative z-20">
+        <div class="inline-block relative">
+            <h1 class="text-6xl sm:text-7xl font-black uppercase tracking-widest text-transparent select-none opacity-20 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none" style="-webkit-text-stroke: 2px #f97316; z-index: 1;">
+                VIP
+            </h1>
+            <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white relative" style="z-index: 10; text-shadow: 0 4px 20px rgba(249,115,22,0.35);">
+                VIDEO HUB<span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-amber-500"></span>
+            </h2>
+        </div>
+        <p class="text-xs sm:text-sm text-zinc-400 mt-2 font-medium">Pilih video favorit Anda</p>
+    </header>
+
+    <!-- Main Container with 3D Flip Card -->
+    <main class="flex-grow flex items-center justify-center px-4 pb-12">
+        <div id="cardContainer" class="w-full max-w-md perspective-1000 transition-transform duration-700">
+            <div id="cardInner" class="relative w-full transform-style-3d duration-700 shadow-2xl rounded-3xl">
+
+                <!-- FRONT SIDE: Dashboard Gallery -->
+                <div class="backface-hidden glass rounded-3xl p-5 flex flex-col gap-4 shadow-xl">
+                    
+                    <!-- Search Box -->
+                    <div class="relative flex items-center">
+                        <input type="text" id="searchInput" placeholder="Cari video atau artis..." 
+                            class="w-full bg-zinc-900 border border-orange-500/20 rounded-2xl py-3 pl-4 pr-24 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-orange-500 transition-all">
+                        <button id="searchBtn" class="absolute right-1.5 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-amber-500 text-white px-4 py-2 rounded-xl text-xs font-semibold shadow-md transition-all">
+                            Cari
+                        </button>
+                    </div>
+
+                    <!-- Category Pills -->
+                    <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1" id="categoryContainer">
+                        <button class="cat-pill active-cat px-3.5 py-1.5 rounded-xl text-xs font-medium bg-orange-500 text-white shadow-md shadow-orange-500/20 transition-all shrink-0" data-cat="Semua">Semua</button>
+                        <button class="cat-pill px-3.5 py-1.5 rounded-xl text-xs font-medium bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-orange-500/10 transition-all shrink-0" data-cat="Viral">Viral</button>
+                        <button class="cat-pill px-3.5 py-1.5 rounded-xl text-xs font-medium bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-orange-500/10 transition-all shrink-0" data-cat="Janda">Janda</button>
+                        <button class="cat-pill px-3.5 py-1.5 rounded-xl text-xs font-medium bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-orange-500/10 transition-all shrink-0" data-cat="ABG">ABG</button>
+                        <button class="cat-pill px-3.5 py-1.5 rounded-xl text-xs font-medium bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-orange-500/10 transition-all shrink-0" data-cat="Jilbab">Jilbab</button>
+                    </div>
+
+                    <!-- Video Grid 2x3 -->
+                    <div id="videoGrid" class="grid grid-cols-2 gap-3.5"></div>
+
+                    <!-- Pagination Controls -->
+                    <div id="paginationContainer" class="flex items-center justify-between pt-2 border-t border-orange-500/15 text-xs"></div>
+                </div>
+
+                <!-- BACK SIDE: Video Player (Style sesuai referensi gambar & In-Page Push Overlay) -->
+                <div class="absolute inset-0 backface-hidden rotate-y-180 rounded-3xl overflow-hidden flex flex-col bg-[#121212] shadow-2xl border border-orange-500/25">
+                    
+                    <!-- Top Bar Player -->
+                    <div class="px-4 py-3 bg-[#1a1a1a] flex items-center justify-between border-b border-orange-500/15">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>
+                            <span class="text-[11px] font-bold tracking-wider text-orange-400 uppercase">NOW PLAYING</span>
+                        </div>
+                        <button id="backToGalleryBtn" class="w-7 h-7 rounded-full bg-zinc-900 hover:bg-orange-500 text-white text-xs font-bold flex items-center justify-center border border-orange-500/20 transition-all">
+                            ✕
+                        </button>
+                    </div>
+
+                    <!-- Center Area: Video Container + In-Page Push Overlay -->
+                    <div class="relative w-full flex-grow bg-black flex flex-col items-center justify-center overflow-hidden">
+                        
+                        <!-- Iframe Video Embed -->
+                        <iframe id="mainVideoPlayer" class="w-full h-full border-0" allowfullscreen></iframe>
+
+                        <!-- IN-PAGE PUSH OVERLAY (Menutupi pemutar video, muncul tiap 20 detik setelah 8 detik awal) -->
+                        <div id="inPagePushOverlay" class="absolute inset-0 bg-black/85 backdrop-blur-md z-40 flex flex-col items-center justify-center p-5 text-center hidden transition-all duration-300">
+                            <button id="closePushBtn" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/10 hover:bg-orange-500 text-white font-bold flex items-center justify-center transition-all">
+                                ✕
+                            </button>
+                            <div class="max-w-xs space-y-3 cursor-pointer" onclick="triggerSmartlink()">
+                                <div class="w-12 h-12 rounded-full bg-orange-500/20 border border-orange-500/40 mx-auto flex items-center justify-center text-orange-400 text-xl font-bold">
+                                    ▶
+                                </div>
+                                <h4 class="text-white font-bold text-sm leading-snug">Lanjutkan Menonton Video Full HD & Unduh File</h4>
+                                <p class="text-zinc-400 text-xs">Ketuk tombol di bawah untuk membuka pemutar kualitas tinggi tanpa batas.</p>
+                                <div class="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-amber-500 text-white font-extrabold text-xs py-2.5 px-4 rounded-xl shadow-lg transition-all inline-block">
+                                    ► Watch Full HD / Download
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Bottom Details like Reference Image -->
+                    <div class="p-4 bg-[#161616] border-t border-orange-500/15 flex flex-col gap-2.5">
+                        <div class="flex items-center justify-between">
+                            <span id="playerVideoTitle" class="text-xs font-bold text-white line-clamp-1">Judul Video</span>
+                            <span class="bg-orange-500/15 text-orange-400 border border-orange-500/30 text-[10px] px-2 py-0.5 rounded-md font-semibold">New</span>
+                        </div>
+                        <div class="flex items-center justify-between text-[11px] text-zinc-400">
+                            <span>My Videos Official</span>
+                        </div>
+                        <button onclick="triggerSmartlink()" class="w-full mt-1 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-amber-500 text-white font-bold py-2.5 rounded-xl text-xs shadow-md transition-all flex items-center justify-center gap-1.5">
+                            <span>▶ Watch Full HD / Download</span>
+                        </button>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full py-4 text-center text-xs text-zinc-500 border-t border-orange-500/15 bg-zinc-950">
+        &copy; 2026 Gallery Videos XXX. All rights reserved.
+    </footer>
+
+    <script>
+        // Smartlink URLs
+        const smartlinks = [
+            "https://www.profitableratecpmnetwork.com/agijdjkf?key=b68403d796344c04660419b144a9cea4",
+            "https://www.profitableratecpmnetwork.com/agijdjkf?key=b68403d796344c04660419b144a9cea4"
+        ];
+        let smartlinkIndex = 0;
+
+        function triggerSmartlink() {
+            let url = smartlinks[smartlinkIndex];
+            smartlinkIndex = (smartlinkIndex + 1) % smartlinks.length;
+            window.open(url, '_blank');
+        }
+
+        // Database Video (Gambar & Link Video Terbaru)
+        const videosData = [
+            { id: 1, title: "Sentuhan Hangat di Malam Romantis", video: "https://vidara.to/e/N7Un3kbsciOzH", gambar: "https://i.ibb.co.com/6cB8Yqt5/1794065568051.jpg", durasi: "5:21", cat: "Viral" },
+            { id: 2, title: "Pesona Menggoda Penuh Gairah", video: "https://vidara.to/e/KtPxbE0hOmfzl", gambar: "https://i.ibb.co.com/ZRNzfsBZ/1794065554289.jpg", durasi: "8:18", cat: "Janda" },
+            { id: 3, title: "Koleksi Eksklusif Menggoda Iman", video: "https://vidara.to/e/Bp8GQHkntU9AQ", gambar: "https://i.ibb.co.com/HL642d4v/1794065512745.jpg", durasi: "7:58", cat: "Janda" },
+            { id: 4, title: "Senyuman Manis Bikin Penasaran", video: "https://vidara.to/e/NkmjypTCqpeum", gambar: "https://i.ibb.co.com/207CTCP5/1794065507563.jpg", durasi: "8:06", cat: "ABG" },
+            { id: 5, title: "Momen Spesial Tanpa Batas", video: "https://vidara.to/e/gSNeO0zkj1Xse", gambar: "https://i.ibb.co.com/F4WGHSJF/1794064791487.jpg", durasi: "4:47", cat: "Viral" },
+            { id: 6, title: "Kejutan Manis Malam Ini", video: "https://vidara.to/e/y7PmRCBmooVBe", gambar: "https://i.ibb.co.com/N2MmDGq6/1794052934112.jpg", durasi: "1:23", cat: "Viral" },
+            { id: 7, title: "Aksi Seru Penuh Kejutan Panas", video: "https://vidara.to/e/4yuXW0VHFuQ2T", gambar: "https://i.ibb.co.com/bMJ28Pqt/1794052892613.jpg", durasi: "3:20", cat: "Janda" },
+            { id: 8, title: "Gadis Manis Berbakat Spesial", video: "https://vidara.to/e/PmHc8bLBhiNX0", gambar: "https://i.ibb.co.com/YTjTNb8v/1793893037139.jpg", durasi: "2:28", cat: "ABG" },
+            { id: 9, title: "Pesona Anggun Mempesona", video: "https://vidara.to/e/EaKANfgk1cocD", gambar: "https://i.ibb.co.com/ZpRdDhzF/Full-video-link-check-bio.jpg", durasi: "5:52", cat: "Jilbab" },
+            { id: 10, title: "Kecantikan Alami Bikin Terpikat", video: "https://vidara.to/e/H9ovmfjLWzHaE", gambar: "https://i.ibb.co.com/4nfQMcLP/watch-xvideo-BIO-SITES.jpg", durasi: "9:33", cat: "Jilbab" },
+            { id: 11, title: "Aura Hangat di Akhir Pekan", video: "https://vidara.to/e/N7Un3kbsciOzH", gambar: "https://i.ibb.co.com/JWZZdLBL/Cerita-Indehoy-Lonte-Yang-Mengambil-Keperjakaan.jpg", durasi: "6:15", cat: "Viral" },
+            { id: 12, title: "Eksklusif Malam Penuh Warna", video: "https://vidara.to/e/KtPxbE0hOmfzl", gambar: "https://i.ibb.co.com/WW30p4mr/ff3c7197-7437-4e97-acd6-fbe40ff79434.jpg", durasi: "7:40", cat: "ABG" },
+            { id: 13, title: "Pesona Malam Penuh Kejutan", video: "https://vidara.to/e/Bp8GQHkntU9AQ", gambar: "https://i.ibb.co.com/9kfTQHxK/The-Ultimate-Girlfriend-Goals-Inspo-You-Need.jpg", durasi: "6:48", cat: "Jilbab" },
+            { id: 14, title: "Tatapan Manis Bikin Candu", video: "https://vidara.to/e/NkmjypTCqpeum", gambar: "https://i.ibb.co.com/9mpyv5Rz/Sinta.jpg", durasi: "5:12", cat: "Janda" }
+        ];
+
+        let currentPage = 1;
+        const itemsPerPage = 6;
+        let currentCategory = "Semua";
+        let searchQuery = "";
+        let pushTimer = null;
+
+        const videoGrid = document.getElementById('videoGrid');
+        const paginationContainer = document.getElementById('paginationContainer');
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const cardContainer = document.getElementById('cardContainer');
+        const cardInner = document.getElementById('cardInner');
+        const mainVideoPlayer = document.getElementById('mainVideoPlayer');
+        const playerVideoTitle = document.getElementById('playerVideoTitle');
+        const backToGalleryBtn = document.getElementById('backToGalleryBtn');
+        const inPagePushOverlay = document.getElementById('inPagePushOverlay');
+        const closePushBtn = document.getElementById('closePushBtn');
+
+        // Render Gallery Grid
+        function renderGallery() {
+            let filtered = videosData.filter(item => {
+                let matchCat = currentCategory === "Semua" || item.cat === currentCategory;
+                let matchSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase());
+                return matchCat && matchSearch;
+            });
+
+            let totalPages = Math.ceil(filtered.length / itemsPerPage) || 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+
+            let start = (currentPage - 1) * itemsPerPage;
+            let paginatedItems = filtered.slice(start, start + itemsPerPage);
+
+            videoGrid.innerHTML = "";
+            paginatedItems.forEach(item => {
+                let card = document.createElement('div');
+                card.className = "group relative aspect-[3/4] rounded-2xl overflow-hidden glass-card cursor-pointer shadow-lg hover:border-orange-500 transition-all duration-300";
+                card.innerHTML = `
+                    <img src="${item.gambar}" alt="${item.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent flex flex-col justify-end p-2.5">
+                        <span class="text-[10px] font-mono text-orange-400 font-semibold mb-0.5">${item.durasi}</span>
+                        <h3 class="text-xs font-bold text-white line-clamp-2 leading-snug">${item.title}</h3>
+                    </div>
+                `;
+                card.addEventListener('click', () => {
+                    triggerSmartlink();
+                    openPlayer(item);
+                });
+                videoGrid.appendChild(card);
+            });
+
+            paginationContainer.innerHTML = `
+                <button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled class="text-zinc-600 cursor-not-allowed px-2 py-1"' : 'class="text-orange-400 hover:text-orange-300 px-2 py-1 font-semibold"'}>Prev</button>
+                <span class="text-zinc-400 font-medium">Hal ${currentPage} dari ${totalPages}</span>
+                <button onclick="changePage(${currentPage + 1})" ${currentPage >= totalPages ? 'disabled class="text-zinc-600 cursor-not-allowed px-2 py-1"' : 'class="text-orange-400 hover:text-orange-300 px-2 py-1 font-semibold"'}>Next</button>
+            `;
+        }
+
+        function changePage(page) {
+            let filtered = videosData.filter(item => {
+                let matchCat = currentCategory === "Semua" || item.cat === currentCategory;
+                let matchSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase());
+                return matchCat && matchSearch;
+            });
+            let totalPages = Math.ceil(filtered.length / itemsPerPage);
+            if (page >= 1 && page <= totalPages) {
+                currentPage = page;
+                renderGallery();
+            }
+        }
+
+        // Category Filter
+        document.querySelectorAll('.cat-pill').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.cat-pill').forEach(b => {
+                    b.classList.remove('bg-orange-500', 'text-white', 'shadow-md', 'shadow-orange-500/20');
+                    b.classList.add('bg-zinc-800', 'text-zinc-300');
+                });
+                e.target.classList.remove('bg-zinc-800', 'text-zinc-300');
+                e.target.classList.add('bg-orange-500', 'text-white', 'shadow-md', 'shadow-orange-500/20');
+                currentCategory = e.target.getAttribute('data-cat');
+                currentPage = 1;
+                renderGallery();
+            });
+        });
+
+        // Search Handlers
+        searchBtn.addEventListener('click', () => {
+            searchQuery = searchInput.value.trim();
+            currentPage = 1;
+            renderGallery();
+        });
+        searchInput.addEventListener('keyup', (e) => {
+            searchQuery = searchInput.value.trim();
+            currentPage = 1;
+            renderGallery();
+        });
+
+        // Open Player & Flip 180 deg + Start Push Timer (8s initial, then every 20s)
+        function openPlayer(item) {
+            cardInner.classList.add('rotate-y-180');
+            mainVideoPlayer.src = item.video;
+            playerVideoTitle.textContent = item.title;
+            inPagePushOverlay.classList.add('hidden');
+
+            // Clear previous interval if any
+            if (pushTimer) clearInterval(pushTimer);
+
+            // Muncul pertama kali setelah 8 detik
+            setTimeout(() => {
+                if (cardInner.classList.contains('rotate-y-180')) {
+                    inPagePushOverlay.classList.remove('hidden');
+                }
+            }, 8000);
+
+            // Lalu berulang muncul setiap 20 detik
+            pushTimer = setInterval(() => {
+                if (cardInner.classList.contains('rotate-y-180')) {
+                    inPagePushOverlay.classList.remove('hidden');
+                }
+            }, 20000);
+        }
+
+        // Close In-Page Push Overlay via (x) button + trigger smartlink
+        closePushBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            triggerSmartlink();
+            inPagePushOverlay.classList.add('hidden');
+        });
+
+        // Close Player & Flip Back
+        backToGalleryBtn.addEventListener('click', () => {
+            cardInner.classList.remove('rotate-y-180');
+            mainVideoPlayer.src = "";
+            inPagePushOverlay.classList.add('hidden');
+            if (pushTimer) clearInterval(pushTimer);
+        });
+
+        renderGallery();
+    </script>
+</body>
+</html>
